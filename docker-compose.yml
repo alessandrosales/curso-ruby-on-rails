@@ -1,0 +1,33 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    environment: 
+      POSTGRES_PASSWORD: "${DATABASE_PASSWORD}"
+    ports: 
+      - 5432
+  webapp:
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - ./webapp:/webapp
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    environment: 
+      RAILS_ENV:  "${ENV}"
+      RAILS_SERVE_STATIC_FILES: "${RAILS_SERVE_STATIC_FILES}"
+      SECRET_KEY_BASE:  "${SECRET_KEY_BASE}"
+      DATABASE_PASSWORD: "${DATABASE_PASSWORD}"
+  pgadmin4:
+    image: fenglc/pgadmin4
+    ports:
+      - 5050
+    depends_on: 
+      - db
+    environment: 
+      DEFAULT_USER: "${PGADMIN4_USER}"
+      DEFAULT_PASSWORD: "${PGADMIN4_PASSWORD}"
